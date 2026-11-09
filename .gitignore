@@ -1,0 +1,12 @@
+analyze/
+
+# build output
+/sunrise
+/bin/
+/dist/
+*.test
+*.out
+
+# local configuration
+.env
+.claude/settings.local.json

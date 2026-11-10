@@ -44,7 +44,13 @@ type Metrics struct {
 
 func New(version, commit, goVersion string, src Sources) *Metrics {
 	reg := prometheus.NewRegistry()
-	reg.MustRegister(collectors.NewGoCollector(), collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	// The prefixed copy lets dashboards pick Sunrise's own memory and CPU even when
+	// several services share one job and instance label.
+	reg.MustRegister(
+		collectors.NewGoCollector(),
+		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
+		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{Namespace: ns}),
+	)
 
 	durations := []float64{.025, .05, .1, .25, .5, 1, 2.5, 5, 10, 20}
 	m := &Metrics{

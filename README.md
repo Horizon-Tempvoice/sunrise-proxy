@@ -75,7 +75,7 @@ Every response carries Discord's count of remaining requests. Parallel responses
 
 A 429 goes back to the client unchanged. Sunrise does not retry. A 429 with scope `user` or `shared` pauses that bucket for `Retry-After`, a 429 with scope `global` pauses the whole bot. It is safe to retry a 429 right away, since the retry waits in the queue.
 
-Requests without a token and the interaction endpoints do not count toward the global limit, because Discord does not count them either.
+The global limit is enforced as a sliding window: at most the limit (50 by default) in any 1.1 seconds. Discord counts requests when they arrive, and the extra 100 ms absorb network jitter that would otherwise squeeze two of Sunrise's seconds into one of Discord's. A bot that sends at the limit for a long time gets about 45 requests per second through. Requests without a token and the interaction endpoints do not count toward the global limit, because Discord does not count them either.
 
 Clients that disconnect while waiting leave the queue and do not use a slot. Response bodies are streamed. Request bodies up to 1 MiB are read before the request waits, which is what lets Sunrise notice a disconnect. Larger bodies are streamed.
 
@@ -124,7 +124,7 @@ Which node owns a request is decided by rendezvous hashing over the live members
 
 Interaction callbacks and `GET /gateway` are always handled by the node that received them. Callbacks are sent once per interaction and do not count toward the global limit. `/gateway` needs no token, and Discord limits tokenless requests per IP.
 
-The global limit of a bot is counted by the node that owns the bot. The other nodes take small batches of the current second's slots from it and spend them locally, so most requests cost no extra network call. If the owner is unreachable, each node falls back to `limit / members` per second until the owner answers again. A global 429 seen by any node pauses the bot on every node.
+The global limit of a bot is counted by the node that owns the bot. The other nodes take small batches of slots from it, valid for 250 ms, and spend them locally, so most requests cost no extra network call. If the owner is unreachable, each node falls back to `limit / members` per second until the owner answers again. A global 429 seen by any node pauses the bot on every node.
 
 Changing members moves buckets to nodes that have not learned them yet, so expect a few extra probes right after a node joins or leaves. Restart nodes one at a time.
 

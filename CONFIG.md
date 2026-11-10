@@ -35,7 +35,7 @@ Local address for connections to Discord, for hosts with several public addresse
 ## Ratelimits
 
 ### SUNRISE_GLOBAL_RATELIMIT
-Global requests per second for a bot without an override, and for each Bearer token. Discord's default is 50. Default `50`.
+Global limit for a bot without an override, and for each Bearer token. Discord's default is 50 per second. Sunrise allows at most this many requests in any 1.1 seconds, which leaves room for network jitter. Default `50`.
 
 ### SUNRISE_BOT_RATELIMIT_OVERRIDES
 Global limits for bots that Discord gave a higher limit. A comma separated list of bot user id and limit, without spaces. Use the bot's user id, which Sunrise reads from the first part of the token. Example: `392827169497284619:100,227115752396685313:80`.

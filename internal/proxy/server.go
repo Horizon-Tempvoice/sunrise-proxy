@@ -146,9 +146,9 @@ func (s *Server) LogBoot() {
 		"concurrent_requests", s.opts.Concurrent,
 		"bearer_lru_size", s.opts.MaxBearers,
 		"idle_bucket_ttl", "10m")
-	mode := "local, fixed 1s windows"
+	mode := "local, sliding window of 1.1s"
 	if s.opts.Clustered {
-		mode = "cluster, owner node leases slots per window"
+		mode = "cluster, owner node leases slots valid for 250ms"
 	}
 	s.rlLog.Info("global limit ready", "mode", mode, "default_per_second", s.opts.GlobalLimit,
 		"not_counted", "tokenless requests, interaction endpoints", "bearer", "always local")

@@ -172,3 +172,33 @@ func TestBucketWindow(t *testing.T) {
 		})
 	}
 }
+
+func TestGlobalWindow(t *testing.T) {
+	base := time.Unix(1_700_000_000, 0)
+	w := NewWindow(3)
+
+	for i := range 3 {
+		if _, ok := w.tryTake(base.Add(time.Duration(i) * 100 * time.Millisecond)); !ok {
+			t.Fatalf("slot %d should be free", i)
+		}
+	}
+	// A plain one second window would allow this; the margin keeps it closed.
+	if wait, ok := w.tryTake(base.Add(time.Second)); ok || wait != 100*time.Millisecond {
+		t.Fatalf("got ok=%v wait=%v, want closed for 100ms", ok, wait)
+	}
+	if _, ok := w.tryTake(base.Add(globalPeriod)); !ok {
+		t.Fatal("first slot should be free again after the period")
+	}
+
+	// Leased slots count until the end of their validity.
+	l := NewWindow(2)
+	if n, valid, _ := l.Grant(base, 5); n != 2 || valid != leaseValid {
+		t.Fatalf("grant: got %d valid %v, want 2 valid %v", n, valid, leaseValid)
+	}
+	if n, retry, _ := l.Grant(base.Add(globalPeriod), 1); n != 0 || retry != leaseValid {
+		t.Fatalf("grant after one period: got %d retry %v, want 0 retry %v", n, retry, leaseValid)
+	}
+	if n, _, _ := l.Grant(base.Add(globalPeriod+leaseValid), 1); n != 1 {
+		t.Fatalf("grant after period plus validity: got %d, want 1", n)
+	}
+}

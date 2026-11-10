@@ -1,4 +1,4 @@
-# Sunrise
+# <img src="assets/icon.svg" alt="" width="40" height="40"> Sunrise
 
 Sunrise is an HTTP proxy for Discord's REST API that handles ratelimits for every client behind it. Point your bot processes at Sunrise instead of `https://discord.com`. Sunrise learns Discord's buckets from the response headers, holds each request until it can go out without a 429, and exports Prometheus metrics about all of it.
 

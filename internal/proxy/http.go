@@ -105,9 +105,14 @@ func (s *Server) tooMany(w http.ResponseWriter, reason string) {
 	s.generated(w, http.StatusTooManyRequests, reason, ratelimitBody{Message: "You are being rate limited.", RetryAfter: 1})
 }
 
+// statusLabel writes statuses as "404 Not Found", and shared scope 429s as "429 Shared",
+// so they do not count toward the invalid request limit in queries.
 func statusLabel(status int, scope string) string {
 	if status == http.StatusTooManyRequests && scope == "shared" {
-		return "429_shared"
+		return "429 Shared"
+	}
+	if text := http.StatusText(status); text != "" {
+		return strconv.Itoa(status) + " " + text
 	}
 	return strconv.Itoa(status)
 }

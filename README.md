@@ -136,11 +136,11 @@ Bearer tokens (OAuth2 user tokens) get their own queues. Sunrise keeps up to `SU
 
 ## Metrics
 
-Metrics are served on `/metrics` of the metrics port. Labels hold normalized routes and bot ids, never tokens or raw paths.
+Metrics are served on `/metrics` of the metrics port. Labels hold normalized routes and bot ids, never tokens or raw paths. To show names next to bot ids, Sunrise looks up each bot's username once with `GET /users/@me` the first time it sees the bot's token. That is one request per bot and node, sent in the background and counted toward the global limit.
 
 | Metric | Labels | Description |
 |---|---|---|
-| `sunrise_requests_seconds` | method, status, route, bot | Histogram of requests to Discord. `status` is the HTTP code, `429_shared` for 429s with scope `shared` |
+| `sunrise_requests_seconds` | method, status, route, bot | Histogram of requests to Discord. `status` is the code with its text, such as `404 Not Found`, and `429 Shared` for 429s with scope `shared` |
 | `sunrise_generated_responses_total` | reason | Responses Sunrise answered itself |
 | `sunrise_errors_total` | kind | Errors while handling requests |
 | `sunrise_open_connections` | method, route | Client requests currently open |
@@ -164,7 +164,9 @@ Metrics are served on `/metrics` of the metrics port. Labels hold normalized rou
 | `sunrise_locked_tokens` | | Tokens locked after a 401 |
 | `sunrise_webhook_404_cached` | | Webhooks answered with a local 404 |
 | `sunrise_hard_brake_total` | | Requests stopped by the hard brake |
+| `sunrise_bot_info` | bot, name | Always 1. Maps a bot id to its username |
 | `sunrise_build_info` | version, commit, go_version | Always 1 |
+| `sunrise_process_*` | | Memory and CPU of the Sunrise process, a prefixed copy of `process_*` |
 
 Go runtime and process metrics are exported as well.
 

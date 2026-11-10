@@ -39,6 +39,9 @@ func (f *fakeDiscord) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	f.auth = append(f.auth, r.Header.Get("Authorization"))
 	h := w.Header()
 	switch r.URL.Path {
+	case "/api/v10/users/@me":
+		_, _ = io.WriteString(w, `{"id":"123456789012345678","username":"bench","discriminator":"0"}`)
+		return
 	case "/api/v10/channels/1/messages", "/api/v10/channels/1/pins":
 		now := time.Now()
 		if now.Sub(f.windowStart) >= time.Second {
@@ -149,6 +152,21 @@ func TestProxyAgainstFakeDiscord(t *testing.T) {
 	res = do("POST", "/api/v10/channels/2/typing")
 	if res.status != http.StatusTooManyRequests || res.took < 800*time.Millisecond {
 		t.Fatalf("request after a 429 should wait for retry-after: status %d, took %v", res.status, res.took)
+	}
+
+	var info dto.Metric
+	deadline := time.Now().Add(2 * time.Second)
+	for {
+		if g, err := m.BotInfo.GetMetricWithLabelValues("123456789012345678", "bench"); err == nil {
+			_ = g.Write(&info)
+			if info.GetGauge().GetValue() == 1 {
+				break
+			}
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("the bot's name was not looked up")
+		}
+		time.Sleep(20 * time.Millisecond)
 	}
 
 	fake.mu.Lock()

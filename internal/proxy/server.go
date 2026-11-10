@@ -83,6 +83,7 @@ type Server struct {
 	Webhooks *guard.Webhooks
 
 	local    localGlobal
+	names    botNames
 	upstream *http.Client
 	cluster  atomic.Pointer[clusterState]
 	recent   *lru.Cache[string, struct{}]
@@ -107,6 +108,7 @@ func New(opts Options, log *slog.Logger) *Server {
 		Locks:    guard.NewLocks(opts.TokenLockDuration),
 		Webhooks: guard.NewWebhooks(opts.Webhook404Duration),
 		local:    localGlobal{g: globals},
+		names:    botNames{next: map[string]time.Time{}},
 		upstream: newUpstreamClient(opts.OutboundIP, opts.DisableHTTP2),
 		recent:   recent,
 	}
@@ -285,6 +287,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.generated(w, http.StatusUnauthorized, "token-locked", discordError{Message: "401: Unauthorized"})
 		return
 	}
+	s.learnName(id, r.Header.Get("Authorization"))
 	if rt.Webhook != "" && s.Webhooks.Dead(rt.Webhook) {
 		s.generated(w, http.StatusNotFound, "webhook-404", discordError{Message: "Unknown Webhook", Code: 10015})
 		return

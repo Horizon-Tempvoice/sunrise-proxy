@@ -40,6 +40,8 @@ type Metrics struct {
 
 	InvalidResponses *prometheus.CounterVec
 	HardBrake        prometheus.Counter
+
+	BotInfo *prometheus.GaugeVec
 }
 
 func New(version, commit, goVersion string, src Sources) *Metrics {
@@ -130,13 +132,17 @@ func New(version, commit, goVersion string, src Sources) *Metrics {
 			Namespace: ns, Name: "hard_brake_total",
 			Help: "Requests answered with a generated 429 by the hard brake.",
 		}),
+		BotInfo: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: ns, Name: "bot_info",
+			Help: "Always 1. Maps a bot id to the bot's username, for dashboards.",
+		}, []string{"bot", "name"}),
 	}
 
 	reg.MustRegister(
 		m.Errors, m.Requests, m.Generated, m.OpenConns, m.RoutedSent, m.RoutedReceived, m.RoutedFailed,
 		m.Waiting, m.WaitTime, m.Remaps,
 		m.ForwardTime, m.ForwardErrors, m.SignatureReject, m.OwnerChanges, m.LeaseRequests, m.LeaseFallbacks,
-		m.InvalidResponses, m.HardBrake,
+		m.InvalidResponses, m.HardBrake, m.BotInfo,
 	)
 
 	build := prometheus.NewGaugeVec(prometheus.GaugeOpts{

@@ -35,15 +35,18 @@
           "uid": "${datasource}"
         },
         "query": {
-          "query": "label_values(sunrise_requests_seconds_count, bot)",
-          "refId": "bot"
+          "query": "query_result(max by (bot, name) (sunrise_bot_info) or on(bot) label_replace(max by (bot) (sunrise_requests_seconds_count), \"name\", \"$1\", \"bot\", \"(.*)\"))",
+          "refId": "bot",
+          "qryType": 3
         },
-        "definition": "label_values(sunrise_requests_seconds_count, bot)",
+        "definition": "query_result(max by (bot, name) (sunrise_bot_info) or on(bot) label_replace(max by (bot) (sunrise_requests_seconds_count), \"name\", \"$1\", \"bot\", \"(.*)\"))",
         "includeAll": true,
         "multi": true,
         "allValue": ".*",
         "current": {},
-        "refresh": 2
+        "refresh": 2,
+        "regex": "/bot=\"(?<value>[^\"]+)\".*name=\"(?<text>[^\"]+)\"/",
+        "sort": 1
       },
       {
         "name": "instance",
@@ -129,7 +132,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(increase(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429\"}[1h]))",
+          "expr": "sum(increase(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429 Too Many Requests\"}[1h])) or vector(0)",
           "refId": "A"
         }
       ],
@@ -275,8 +278,8 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (bot) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[$__rate_interval]))",
-          "legendFormat": "{{bot}}",
+          "expr": "(sum by (bot) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[$__rate_interval])) * on(bot) group_left(name) max by (bot, name) (sunrise_bot_info)) or on(bot) label_replace(sum by (bot) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[$__rate_interval])), \"name\", \"$1\", \"bot\", \"(.*)\")",
+          "legendFormat": "{{name}}",
           "refId": "A"
         },
         {
@@ -371,7 +374,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (method, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429\"}[$__rate_interval]))",
+          "expr": "sum by (method, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429 Too Many Requests\"}[$__rate_interval]))",
           "legendFormat": "{{method}} {{route}}",
           "refId": "A"
         }
@@ -458,7 +461,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (method, status, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=~\"5..\"}[$__rate_interval]))",
+          "expr": "sum by (method, status, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=~\"5.*\"}[$__rate_interval]))",
           "legendFormat": "{{status}} {{method}} {{route}}",
           "refId": "A"
         }
@@ -1272,7 +1275,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (scope) (increase(sunrise_invalid_responses_total{instance=~\"$instance\",status=\"429\"}[1m]))",
+          "expr": "sum by (scope) (increase(sunrise_invalid_responses_total{instance=~\"$instance\",status=\"429 Too Many Requests\"}[1m]))",
           "legendFormat": "{{scope}}",
           "refId": "A"
         },
@@ -1281,7 +1284,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(increase(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429_shared\"}[1m]))",
+          "expr": "sum(increase(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429 Shared\"}[1m]))",
           "legendFormat": "shared",
           "refId": "B"
         }

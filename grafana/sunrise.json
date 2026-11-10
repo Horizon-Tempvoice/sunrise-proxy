@@ -200,10 +200,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -259,10 +260,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -309,10 +311,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -359,10 +362,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -409,10 +413,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -459,10 +464,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -527,10 +533,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -577,10 +584,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -627,10 +635,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -690,10 +699,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -740,10 +750,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -790,10 +801,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -949,10 +961,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -999,10 +1012,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1302,10 +1316,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1352,10 +1367,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1415,10 +1431,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1483,10 +1500,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1534,10 +1552,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1584,10 +1603,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1634,10 +1654,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1684,10 +1705,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []
@@ -1806,10 +1828,11 @@
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
-            "showPoints": "never",
+            "showPoints": "auto",
             "stacking": {
               "mode": "none"
-            }
+            },
+            "pointSize": 5
           }
         },
         "overrides": []

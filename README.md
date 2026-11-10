@@ -71,7 +71,7 @@ Sunrise collapses each request path into a route key: ids become placeholders, t
 
 Discord reports the bucket hash in `X-RateLimit-Bucket`. Routes that report the same hash for the same top-level resource share one queue from then on. The hash alone is not enough, since Discord reuses it across channels and guilds.
 
-Every response carries Discord's own count of remaining requests. Sunrise trusts the newest one and subtracts the requests sent after it. That works the same for fixed and sliding windows. When the window resets, the bucket fills up again.
+Every response carries Discord's count of remaining requests. Parallel responses arrive in a different order than Discord counted them, so within one window a response can only lower what Sunrise thinks is left, never raise it, and requests still in flight are subtracted. Responses from an earlier window are ignored. When the window resets, the bucket fills up again. This needs no guess about whether a bucket uses a fixed or a sliding window. With sliding windows it is slightly slower than possible, because slots Discord gives back early are only used after the reset.
 
 A 429 goes back to the client unchanged. Sunrise does not retry. A 429 with scope `user` or `shared` pauses that bucket for `Retry-After`, a 429 with scope `global` pauses the whole bot. It is safe to retry a 429 right away, since the retry waits in the queue.
 

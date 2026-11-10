@@ -19,7 +19,7 @@ type state struct {
 	pausedUntil time.Time
 	inflight    int
 	sent        uint64
-	applied     uint64
+	winStart    uint64 // first sequence number sent in the current window
 }
 
 // take decides whether one request may go out now. When it may not, a positive wait
@@ -37,6 +37,7 @@ func (s *state) take(now time.Time, concurrent bool) (seq uint64, wait time.Dura
 	if s.windowKnown && !now.Before(s.resetAt) {
 		s.remaining = s.limit
 		s.windowKnown = false
+		s.winStart = s.sent + 1
 	}
 	if !concurrent && s.inflight > 0 {
 		return 0, 0, false
@@ -60,18 +61,17 @@ func (s *state) send() uint64 {
 	return s.sent
 }
 
-// apply folds a response into the state. Discord reports the true remaining count on
-// every response, for fixed and sliding windows alike, so the freshest response wins.
-// Requests sent after it are not reflected in its count yet and are subtracted.
+// apply folds a response into the state. Concurrent responses arrive in a different
+// order than Discord counted them, so a response can never raise what is left in the
+// current window; it can only lower it, for example when another client shares the
+// bucket. Requests still in flight may not be counted yet and are subtracted. A late
+// response from the previous window says nothing about the current one.
 func (s *state) apply(seq uint64, h Headers, now time.Time) {
 	if s.inflight > 0 {
 		s.inflight--
 	}
 	if h.IsRatelimited() {
 		s.pause(h, now)
-		if seq > s.applied {
-			s.applied = seq
-		}
 		return
 	}
 	if !h.HasLimits {
@@ -80,20 +80,26 @@ func (s *state) apply(seq uint64, h Headers, now time.Time) {
 		}
 		return
 	}
-	s.known = true
-	s.free = false
-	s.limit = h.Limit
-	if seq <= s.applied {
+	rem := max(0, h.Remaining-s.inflight)
+	reset := now.Add(h.ResetAfter)
+	if !s.known {
+		s.known = true
+		s.free = false
+		s.limit = h.Limit
+		s.remaining = rem
+		s.resetAt = reset
+		s.windowKnown = true
 		return
 	}
-	s.applied = seq
-	rem := h.Remaining - int(s.sent-seq)
-	if rem < 0 {
-		rem = 0
+	s.limit = h.Limit
+	if seq < s.winStart {
+		return
 	}
-	s.remaining = rem
-	s.resetAt = now.Add(h.ResetAfter)
-	s.windowKnown = true
+	s.remaining = min(s.remaining, rem)
+	if !s.windowKnown || reset.After(s.resetAt) {
+		s.resetAt = reset
+		s.windowKnown = true
+	}
 }
 
 func (s *state) pause(h Headers, now time.Time) {

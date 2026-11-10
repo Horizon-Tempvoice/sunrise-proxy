@@ -7,7 +7,7 @@ import (
 
 type step struct {
 	at  time.Duration
-	op  string // take, apply, abort
+	op  string // take, apply, merge, abort
 	seq uint64
 	h   Headers
 
@@ -39,17 +39,17 @@ func TestBucketWindow(t *testing.T) {
 			},
 		},
 		{
-			name: "out of order responses: freshest wins, later sends are subtracted", concurrent: true,
+			name: "out of order responses never raise what is left", concurrent: true,
 			steps: []step{
 				{op: "take", ok: true},
 				{op: "apply", seq: 1, h: limits(5, 4, 2*s)},
 				{op: "take", ok: true},
 				{op: "take", ok: true},
 				{op: "take", ok: true},
+				// seq 3 says 2 left, but seq 2 and 4 are still out and may not be counted yet.
 				{at: 100 * ms, op: "apply", seq: 3, h: limits(5, 2, 1900*ms)},
 				{at: 100 * ms, op: "apply", seq: 2, h: limits(5, 3, 1950*ms)},
-				{at: 100 * ms, op: "take", ok: true},
-				{at: 100 * ms, op: "take", ok: false, wait: 1900 * ms},
+				{at: 100 * ms, op: "take", ok: false, wait: 1950 * ms},
 			},
 		},
 		{
@@ -67,7 +67,19 @@ func TestBucketWindow(t *testing.T) {
 			},
 		},
 		{
-			name: "sliding window: regained slots show up in remaining", concurrent: true,
+			name: "a late response from the previous window does not refill again", concurrent: true,
+			steps: []step{
+				{op: "take", ok: true},
+				{op: "apply", seq: 1, h: limits(2, 1, s)},
+				{op: "take", ok: true},
+				{at: s, op: "take", ok: true},
+				{at: s + 20*ms, op: "apply", seq: 2, h: limits(2, 0, 0)},
+				{at: s + 30*ms, op: "take", ok: true},
+				{at: s + 30*ms, op: "take", ok: false, wait: 0},
+			},
+		},
+		{
+			name: "regained slots in a sliding window wait for the reset", concurrent: true,
 			steps: []step{
 				{op: "take", ok: true},
 				{op: "apply", seq: 1, h: limits(3, 2, 3*s)},
@@ -75,7 +87,7 @@ func TestBucketWindow(t *testing.T) {
 				{op: "take", ok: true},
 				{op: "take", ok: false, wait: 3 * s},
 				{at: 1500 * ms, op: "apply", seq: 3, h: limits(3, 1, 1500*ms)},
-				{at: 1500 * ms, op: "take", ok: true},
+				{at: 1500 * ms, op: "take", ok: false, wait: 1500 * ms},
 			},
 		},
 		{

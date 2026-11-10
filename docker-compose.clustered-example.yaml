@@ -1,0 +1,66 @@
+# Three Sunrise nodes on one private network. They find each other through the
+# shared DNS alias "sunrise-cluster", which Docker resolves to every node's IP.
+# Only sunrise-a publishes ports, and only on loopback.
+#
+# Replace the secret before running this anywhere real:
+#   openssl rand -hex 32
+
+x-sunrise: &sunrise
+  build:
+    context: .
+    args:
+      VERSION: ${VERSION:-dev}
+      COMMIT: ${COMMIT:-}
+  image: ghcr.io/horizon-tempvoice/sunrise-proxy:latest
+  restart: unless-stopped
+  read_only: true
+  user: "65532:65532"
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  stop_grace_period: 30s
+  deploy:
+    resources:
+      limits: { cpus: "1", memory: 256M }
+
+x-env: &env
+  SUNRISE_CLUSTER_DNS: sunrise-cluster
+  SUNRISE_CLUSTER_SECRET: ${SUNRISE_CLUSTER_SECRET:-CHANGE-ME-generate-with-openssl-rand-hex-32}
+  SUNRISE_REQUEST_TIMEOUT: "15000"
+  SUNRISE_LOG_LEVEL: ${SUNRISE_LOG_LEVEL:-info}
+
+services:
+  sunrise-a:
+    <<: *sunrise
+    hostname: sunrise-a
+    environment:
+      <<: *env
+      SUNRISE_NODE_NAME: sunrise-a
+    networks:
+      sunrise:
+        aliases: [sunrise-cluster]
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:9000:9000"
+
+  sunrise-b:
+    <<: *sunrise
+    hostname: sunrise-b
+    environment:
+      <<: *env
+      SUNRISE_NODE_NAME: sunrise-b
+    networks:
+      sunrise:
+        aliases: [sunrise-cluster]
+
+  sunrise-c:
+    <<: *sunrise
+    hostname: sunrise-c
+    environment:
+      <<: *env
+      SUNRISE_NODE_NAME: sunrise-c
+    networks:
+      sunrise:
+        aliases: [sunrise-cluster]
+
+networks:
+  sunrise: {}

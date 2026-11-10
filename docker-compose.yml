@@ -1,0 +1,24 @@
+services:
+  sunrise:
+    build:
+      context: .
+      args:
+        VERSION: ${VERSION:-dev}
+        COMMIT: ${COMMIT:-}
+    image: ghcr.io/horizon-tempvoice/sunrise-proxy:latest
+    restart: unless-stopped
+    read_only: true
+    user: "65532:65532"
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    environment:
+      SUNRISE_REQUEST_TIMEOUT: "15000"
+      SUNRISE_LOG_LEVEL: ${SUNRISE_LOG_LEVEL:-info}
+    # Docker writes its own iptables rules, so a published port skips UFW.
+    # Bind to loopback (or a private interface) only, never to 0.0.0.0.
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:9000:9000"
+    deploy:
+      resources:
+        limits: { cpus: "1", memory: 256M }

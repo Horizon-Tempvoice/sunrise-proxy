@@ -1,4 +1,11 @@
-# <img src="assets/icon.svg" alt="" width="64" height="64"> Sunrise
+<img align="left" width="80" height="80" src="assets/icon.svg" alt="Sunrise icon">
+
+# Sunrise
+
+<br>
+
+[![CI](https://github.com/Horizon-Tempvoice/sunrise-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/Horizon-Tempvoice/sunrise-proxy/actions/workflows/ci.yml?query=branch%3Amain)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
 Sunrise is an HTTP proxy for Discord's REST API that handles ratelimits for every client behind it. Point your bot processes at Sunrise instead of `https://discord.com`. Sunrise learns Discord's buckets from the response headers, holds each request until it can go out without a 429, and exports Prometheus metrics about all of it.
 

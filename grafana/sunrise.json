@@ -69,7 +69,7 @@
   "panels": [
     {
       "type": "stat",
-      "title": "429s from Discord in the last hour",
+      "title": "429s (1h)",
       "id": 1,
       "datasource": {
         "type": "prometheus",
@@ -130,7 +130,7 @@
     },
     {
       "type": "stat",
-      "title": "Requests to Discord per second now",
+      "title": "Reqs/s (now)",
       "id": 2,
       "datasource": {
         "type": "prometheus",
@@ -182,7 +182,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Requests to Discord per second, by bot",
+      "title": "Reqs/s by bot",
       "id": 3,
       "datasource": {
         "type": "prometheus",
@@ -241,7 +241,7 @@
     },
     {
       "type": "timeseries",
-      "title": "429s from Discord per second, by route",
+      "title": "429s by route",
       "id": 4,
       "datasource": {
         "type": "prometheus",
@@ -291,7 +291,7 @@
     },
     {
       "type": "timeseries",
-      "title": "5xx from Discord per second, by route",
+      "title": "5xx by route",
       "id": 5,
       "datasource": {
         "type": "prometheus",
@@ -341,7 +341,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Requests to Discord per second, by status",
+      "title": "Status codes",
       "id": 6,
       "datasource": {
         "type": "prometheus",
@@ -391,7 +391,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Requests to Discord per second, by route",
+      "title": "Reqs by route",
       "id": 7,
       "datasource": {
         "type": "prometheus",
@@ -441,7 +441,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Discord response time (p90, p95, p99)",
+      "title": "Latency",
       "id": 8,
       "datasource": {
         "type": "prometheus",
@@ -509,7 +509,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Discord response time p90, by route",
+      "title": "Latency p90 by route",
       "id": 9,
       "datasource": {
         "type": "prometheus",
@@ -559,7 +559,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Discord response time p99, by route",
+      "title": "Latency p99 by route",
       "id": 10,
       "datasource": {
         "type": "prometheus",
@@ -609,7 +609,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Open client requests",
+      "title": "Open connections",
       "id": 11,
       "datasource": {
         "type": "prometheus",
@@ -672,7 +672,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Requests waiting for a ratelimit slot, by stage",
+      "title": "Waiting requests",
       "id": 13,
       "datasource": {
         "type": "prometheus",
@@ -722,7 +722,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Time spent waiting for a ratelimit slot (p95), by stage",
+      "title": "Wait time p95",
       "id": 14,
       "datasource": {
         "type": "prometheus",
@@ -772,7 +772,7 @@
     },
     {
       "type": "timeseries",
-      "title": "429s from Discord per minute, by scope",
+      "title": "429s by scope",
       "id": 15,
       "datasource": {
         "type": "prometheus",
@@ -831,7 +831,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Buckets tracked per node",
+      "title": "Buckets",
       "id": 16,
       "datasource": {
         "type": "prometheus",
@@ -881,7 +881,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Longest bucket queue per node",
+      "title": "Longest queue",
       "id": 17,
       "datasource": {
         "type": "prometheus",
@@ -931,7 +931,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Routes moved onto a shared bucket, per minute",
+      "title": "Bucket remaps",
       "id": 18,
       "datasource": {
         "type": "prometheus",
@@ -981,7 +981,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Responses Sunrise generated itself per minute, by reason",
+      "title": "Generated responses",
       "id": 19,
       "datasource": {
         "type": "prometheus",
@@ -1044,7 +1044,7 @@
     },
     {
       "type": "stat",
-      "title": "Highest invalid response count of a node, last 10 minutes (ban at 10000)",
+      "title": "Invalid (10m)",
       "id": 21,
       "datasource": {
         "type": "prometheus",
@@ -1100,7 +1100,8 @@
           "expr": "max(sunrise_invalid_requests_window{instance=~\"$instance\"})",
           "refId": "A"
         }
-      ]
+      ],
+      "description": "Highest count of 401, 403 and non-shared 429 responses on one node in the last 10 minutes. Discord bans the IP at 10000."
     },
     {
       "type": "stat",
@@ -1160,7 +1161,7 @@
     },
     {
       "type": "stat",
-      "title": "Webhooks answered with a local 404",
+      "title": "Webhook 404s",
       "id": 23,
       "datasource": {
         "type": "prometheus",
@@ -1212,7 +1213,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Invalid responses in the last 10 minutes, per node (ban at 10000)",
+      "title": "Invalid (10m) by node",
       "id": 24,
       "datasource": {
         "type": "prometheus",
@@ -1278,11 +1279,12 @@
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
-      ]
+      ],
+      "description": "Discord bans the IP at 10000."
     },
     {
       "type": "timeseries",
-      "title": "Invalid responses per minute, by status and scope",
+      "title": "Invalid by status",
       "id": 25,
       "datasource": {
         "type": "prometheus",
@@ -1332,7 +1334,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Requests stopped by the hard brake, per minute",
+      "title": "Hard brake",
       "id": 26,
       "datasource": {
         "type": "prometheus",
@@ -1395,7 +1397,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Requests between nodes per second",
+      "title": "Routed reqs/s",
       "id": 28,
       "datasource": {
         "type": "prometheus",
@@ -1463,7 +1465,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Time until the owner answered a forwarded request (p95, waiting included)",
+      "title": "Forward latency p95",
       "id": 29,
       "datasource": {
         "type": "prometheus",
@@ -1509,11 +1511,12 @@
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
-      ]
+      ],
+      "description": "Includes time the owner waited for a ratelimit slot."
     },
     {
       "type": "timeseries",
-      "title": "Failed forwards per minute, by reason",
+      "title": "Forward errors",
       "id": 30,
       "datasource": {
         "type": "prometheus",
@@ -1563,7 +1566,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Rejected cluster signatures per minute, by reason",
+      "title": "Bad signatures",
       "id": 31,
       "datasource": {
         "type": "prometheus",
@@ -1613,7 +1616,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Routing keys that moved to another node",
+      "title": "Owner changes",
       "id": 32,
       "datasource": {
         "type": "prometheus",
@@ -1663,7 +1666,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Global limit batches requested from the owner per minute, by result",
+      "title": "Global leases",
       "id": 33,
       "datasource": {
         "type": "prometheus",
@@ -1722,7 +1725,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Cluster members seen by each node",
+      "title": "Members",
       "id": 34,
       "datasource": {
         "type": "prometheus",
@@ -1785,7 +1788,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Errors per minute, by kind",
+      "title": "Errors",
       "id": 36,
       "datasource": {
         "type": "prometheus",
@@ -1835,7 +1838,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Resident memory per node",
+      "title": "Memory",
       "id": 37,
       "datasource": {
         "type": "prometheus",
@@ -1885,7 +1888,7 @@
     },
     {
       "type": "timeseries",
-      "title": "CPU used per node",
+      "title": "CPU",
       "id": 38,
       "datasource": {
         "type": "prometheus",

@@ -3,12 +3,12 @@
   "uid": "sunrise",
   "editable": true,
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
-  "refresh": "30s",
+  "refresh": "10s",
   "graphTooltip": 1,
   "tags": [
     "sunrise",
@@ -25,25 +25,6 @@
         "type": "datasource",
         "query": "prometheus",
         "current": {}
-      },
-      {
-        "name": "instance",
-        "label": "Node",
-        "type": "query",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${datasource}"
-        },
-        "query": {
-          "query": "label_values(sunrise_build_info, instance)",
-          "refId": "instance"
-        },
-        "definition": "label_values(sunrise_build_info, instance)",
-        "includeAll": true,
-        "multi": true,
-        "allValue": ".*",
-        "current": {},
-        "refresh": 2
       },
       {
         "name": "bot",
@@ -63,89 +44,42 @@
         "allValue": ".*",
         "current": {},
         "refresh": 2
+      },
+      {
+        "name": "instance",
+        "label": "Node",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "query": {
+          "query": "label_values(sunrise_build_info, instance)",
+          "refId": "instance"
+        },
+        "definition": "label_values(sunrise_build_info, instance)",
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "current": {},
+        "refresh": 2
       }
     ]
   },
   "panels": [
     {
-      "type": "row",
-      "title": "Overview",
-      "id": 2,
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "panels": []
-    },
-    {
       "type": "stat",
-      "title": "Requests to Discord per second",
-      "id": 3,
+      "title": "429s from Discord in the last hour",
+      "id": 1,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 4,
-        "w": 4,
         "x": 0,
-        "y": 1
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "reqps",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[1m]))",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "type": "stat",
-      "title": "429s from Discord in the last hour (shared scope not included)",
-      "id": 4,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 4,
-        "y": 1
+        "y": 0,
+        "w": 3,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
@@ -189,261 +123,76 @@
             "uid": "${datasource}"
           },
           "expr": "sum(increase(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429\"}[1h]))",
-          "legendFormat": "",
           "refId": "A"
         }
-      ]
+      ],
+      "timeFrom": "1h"
     },
     {
       "type": "stat",
-      "title": "Highest invalid response count of a node, last 10 minutes (ban at 10000)",
-      "id": 5,
+      "title": "Requests to Discord per second now",
+      "id": 2,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 4,
+        "x": 3,
+        "y": 0,
+        "w": 3,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Requests to Discord per second, by bot",
+      "id": 3,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
         "w": 6,
-        "x": 9,
-        "y": 1
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 2500
-              },
-              {
-                "color": "red",
-                "value": 7500
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "max(sunrise_invalid_requests_window{instance=~\"$instance\"})",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "type": "stat",
-      "title": "Cluster members seen by each node (lowest)",
-      "id": 6,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 15,
-        "y": 1
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "min(sunrise_cluster_members{instance=~\"$instance\"})",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "type": "stat",
-      "title": "Locked tokens",
-      "id": 7,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 18,
-        "y": 1
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(sunrise_locked_tokens{instance=~\"$instance\"})",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "type": "stat",
-      "title": "Requests waiting for a ratelimit slot",
-      "id": 8,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 21,
-        "y": 1
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(sunrise_requests_waiting{instance=~\"$instance\"})",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "type": "row",
-      "title": "Traffic",
-      "id": 9,
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 5
-      },
-      "panels": []
-    },
-    {
-      "type": "timeseries",
-      "title": "Requests to Discord per second by status",
-      "id": 10,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 6
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
@@ -475,25 +224,34 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (status) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[1m]))",
-          "legendFormat": "{{status}}",
+          "expr": "sum by (bot) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[$__rate_interval]))",
+          "legendFormat": "{{bot}}",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[1m]))",
+          "legendFormat": "total",
+          "refId": "B"
         }
       ]
     },
     {
       "type": "timeseries",
-      "title": "Requests to Discord per second by route, top 10",
-      "id": 11,
+      "title": "429s from Discord per second, by route",
+      "id": 4,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 6
+        "y": 0,
+        "w": 6,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
@@ -525,7 +283,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "topk(10, sum by (method, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[5m])))",
+          "expr": "sum by (method, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=\"429\"}[$__rate_interval]))",
           "legendFormat": "{{method}} {{route}}",
           "refId": "A"
         }
@@ -533,17 +291,167 @@
     },
     {
       "type": "timeseries",
-      "title": "Discord response time (p50, p95, p99)",
-      "id": 12,
+      "title": "5xx from Discord per second, by route",
+      "id": 5,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (method, status, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\",status=~\"5..\"}[$__rate_interval]))",
+          "legendFormat": "{{status}} {{method}} {{route}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Requests to Discord per second, by status",
+      "id": 6,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
         "x": 0,
-        "y": 14
+        "y": 7,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (status) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[$__rate_interval]))",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Requests to Discord per second, by route",
+      "id": 7,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 15,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (method, route) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[$__rate_interval]))",
+          "legendFormat": "{{method}} {{route}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Discord response time (p90, p95, p99)",
+      "id": 8,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 12,
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
@@ -575,8 +483,8 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "histogram_quantile(0.5, sum by (le) (rate(sunrise_requests_seconds_bucket{instance=~\"$instance\",bot=~\"$bot\"}[5m])))",
-          "legendFormat": "p50",
+          "expr": "histogram_quantile(0.90, sum by (le) (rate(sunrise_requests_seconds_bucket{instance=~\"$instance\",bot=~\"$bot\"}[5m])))",
+          "legendFormat": "p90",
           "refId": "A"
         },
         {
@@ -601,21 +509,21 @@
     },
     {
       "type": "timeseries",
-      "title": "Requests to Discord per second by bot",
-      "id": 13,
+      "title": "Discord response time p90, by route",
+      "id": 9,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 14
+        "y": 23,
+        "w": 12,
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
+          "unit": "s",
           "custom": {
             "fillOpacity": 10,
             "lineWidth": 1,
@@ -643,25 +551,75 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (bot) (rate(sunrise_requests_seconds_count{instance=~\"$instance\",bot=~\"$bot\"}[1m]))",
-          "legendFormat": "{{bot}}",
+          "expr": "histogram_quantile(0.90, sum by (le, method, route) (rate(sunrise_requests_seconds_bucket{instance=~\"$instance\",bot=~\"$bot\"}[5m])))",
+          "legendFormat": "{{method}} {{route}}",
           "refId": "A"
         }
       ]
     },
     {
       "type": "timeseries",
-      "title": "Open client requests per node",
-      "id": 14,
+      "title": "Discord response time p99, by route",
+      "id": 10,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 22
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "histogram_quantile(0.99, sum by (le, method, route) (rate(sunrise_requests_seconds_bucket{instance=~\"$instance\",bot=~\"$bot\"}[5m])))",
+          "legendFormat": "{{method}} {{route}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Open client requests",
+      "id": 11,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -700,81 +658,31 @@
       ]
     },
     {
-      "type": "timeseries",
-      "title": "Responses Sunrise generated itself per minute, by reason",
-      "id": 15,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 22
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": {
-            "fillOpacity": 10,
-            "lineWidth": 1,
-            "showPoints": "never",
-            "stacking": {
-              "mode": "none"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by (reason) (increase(sunrise_generated_responses_total{instance=~\"$instance\"}[1m]))",
-          "legendFormat": "{{reason}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "type": "row",
       "title": "Ratelimits",
-      "id": 16,
+      "id": 12,
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 30
+        "y": 40,
+        "w": 24,
+        "h": 1
       },
       "panels": []
     },
     {
       "type": "timeseries",
       "title": "Requests waiting for a ratelimit slot, by stage",
-      "id": 17,
+      "id": 13,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 0,
-        "y": 31
+        "y": 41,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -815,16 +723,16 @@
     {
       "type": "timeseries",
       "title": "Time spent waiting for a ratelimit slot (p95), by stage",
-      "id": 18,
+      "id": 14,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 8,
-        "y": 31
+        "y": 41,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -865,16 +773,16 @@
     {
       "type": "timeseries",
       "title": "429s from Discord per minute, by scope",
-      "id": 19,
+      "id": 15,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 16,
-        "y": 31
+        "y": 41,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -924,16 +832,16 @@
     {
       "type": "timeseries",
       "title": "Buckets tracked per node",
-      "id": 20,
+      "id": 16,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 0,
-        "y": 39
+        "y": 49,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -974,16 +882,16 @@
     {
       "type": "timeseries",
       "title": "Longest bucket queue per node",
-      "id": 21,
+      "id": 17,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 8,
-        "y": 39
+        "y": 49,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1024,16 +932,16 @@
     {
       "type": "timeseries",
       "title": "Routes moved onto a shared bucket, per minute",
-      "id": 22,
+      "id": 18,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 16,
-        "y": 39
+        "y": 49,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1072,17 +980,235 @@
       ]
     },
     {
+      "type": "timeseries",
+      "title": "Responses Sunrise generated itself per minute, by reason",
+      "id": 19,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (reason) (increase(sunrise_generated_responses_total{instance=~\"$instance\"}[1m]))",
+          "legendFormat": "{{reason}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "type": "row",
       "title": "Cloudflare protection",
-      "id": 23,
+      "id": 20,
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 47
+        "y": 65,
+        "w": 24,
+        "h": 1
       },
       "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Highest invalid response count of a node, last 10 minutes (ban at 10000)",
+      "id": 21,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 66,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 2500
+              },
+              {
+                "color": "red",
+                "value": 7500
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(sunrise_invalid_requests_window{instance=~\"$instance\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Locked tokens",
+      "id": 22,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 66,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(sunrise_locked_tokens{instance=~\"$instance\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Webhooks answered with a local 404",
+      "id": 23,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 66,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(sunrise_webhook_404_cached{instance=~\"$instance\"})",
+          "refId": "A"
+        }
+      ]
     },
     {
       "type": "timeseries",
@@ -1093,10 +1219,10 @@
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 48
+        "y": 70,
+        "w": 12,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1163,10 +1289,10 @@
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 48
+        "y": 70,
+        "w": 12,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1206,76 +1332,17 @@
     },
     {
       "type": "timeseries",
-      "title": "Locked tokens and webhooks answered with a local 404",
+      "title": "Requests stopped by the hard brake, per minute",
       "id": 26,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 56
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": {
-            "fillOpacity": 10,
-            "lineWidth": 1,
-            "showPoints": "never",
-            "stacking": {
-              "mode": "none"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(sunrise_locked_tokens{instance=~\"$instance\"})",
-          "legendFormat": "locked tokens",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(sunrise_webhook_404_cached{instance=~\"$instance\"})",
-          "legendFormat": "webhooks with local 404",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "type": "timeseries",
-      "title": "Requests stopped by the hard brake, per minute",
-      "id": 27,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 56
+        "y": 78,
+        "w": 24,
+        "h": 6
       },
       "fieldConfig": {
         "defaults": {
@@ -1316,29 +1383,29 @@
     {
       "type": "row",
       "title": "Cluster",
-      "id": 28,
+      "id": 27,
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 64
+        "y": 84,
+        "w": 24,
+        "h": 1
       },
       "panels": []
     },
     {
       "type": "timeseries",
       "title": "Requests between nodes per second",
-      "id": 29,
+      "id": 28,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 65
+        "y": 85,
+        "w": 12,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1370,7 +1437,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (instance) (rate(sunrise_routed_sent_total{instance=~\"$instance\"}[1m]))",
+          "expr": "sum by (instance) (rate(sunrise_routed_sent_total{instance=~\"$instance\"}[$__rate_interval]))",
           "legendFormat": "sent by {{instance}}",
           "refId": "A"
         },
@@ -1379,7 +1446,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (instance) (rate(sunrise_routed_received_total{instance=~\"$instance\"}[1m]))",
+          "expr": "sum by (instance) (rate(sunrise_routed_received_total{instance=~\"$instance\"}[$__rate_interval]))",
           "legendFormat": "received by {{instance}}",
           "refId": "B"
         },
@@ -1388,7 +1455,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (instance) (rate(sunrise_routed_failed_total{instance=~\"$instance\"}[1m]))",
+          "expr": "sum by (instance) (rate(sunrise_routed_failed_total{instance=~\"$instance\"}[$__rate_interval]))",
           "legendFormat": "failed on {{instance}}",
           "refId": "C"
         }
@@ -1397,16 +1464,16 @@
     {
       "type": "timeseries",
       "title": "Time until the owner answered a forwarded request (p95, waiting included)",
-      "id": 30,
+      "id": 29,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 65
+        "y": 85,
+        "w": 12,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1447,16 +1514,16 @@
     {
       "type": "timeseries",
       "title": "Failed forwards per minute, by reason",
-      "id": 31,
+      "id": 30,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 0,
-        "y": 73
+        "y": 93,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1497,16 +1564,16 @@
     {
       "type": "timeseries",
       "title": "Rejected cluster signatures per minute, by reason",
-      "id": 32,
+      "id": 31,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 8,
-        "y": 73
+        "y": 93,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1547,16 +1614,16 @@
     {
       "type": "timeseries",
       "title": "Routing keys that moved to another node",
-      "id": 33,
+      "id": 32,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 16,
-        "y": 73
+        "y": 93,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1597,16 +1664,16 @@
     {
       "type": "timeseries",
       "title": "Global limit batches requested from the owner per minute, by result",
-      "id": 34,
+      "id": 33,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 81
+        "y": 101,
+        "w": 12,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1656,16 +1723,16 @@
     {
       "type": "timeseries",
       "title": "Cluster members seen by each node",
-      "id": 35,
+      "id": 34,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 81
+        "y": 101,
+        "w": 12,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1706,29 +1773,29 @@
     {
       "type": "row",
       "title": "Process",
-      "id": 36,
+      "id": 35,
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 89
+        "y": 109,
+        "w": 24,
+        "h": 1
       },
       "panels": []
     },
     {
       "type": "timeseries",
       "title": "Errors per minute, by kind",
-      "id": 37,
+      "id": 36,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 0,
-        "y": 90
+        "y": 110,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1769,16 +1836,16 @@
     {
       "type": "timeseries",
       "title": "Resident memory per node",
-      "id": 38,
+      "id": 37,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 8,
-        "y": 90
+        "y": 110,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1819,16 +1886,16 @@
     {
       "type": "timeseries",
       "title": "CPU used per node",
-      "id": 39,
+      "id": 38,
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 16,
-        "y": 90
+        "y": 110,
+        "w": 8,
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1860,7 +1927,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "rate(process_cpu_seconds_total{instance=~\"$instance\"}[1m]) and on(instance) sunrise_build_info",
+          "expr": "rate(process_cpu_seconds_total{instance=~\"$instance\"}[$__rate_interval]) and on(instance) sunrise_build_info",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
